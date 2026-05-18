@@ -1,14 +1,8 @@
-/**
- * Windows Terminal demo — shell logic.
- * Depends on #out, #cmd, #promptText in the DOM.
- */
+
 
 (function () {
   "use strict";
 
-  // ---------------------------------------------------------------------------
-  // Config
-  // ---------------------------------------------------------------------------
 
   const THEMES = {
     default: {
@@ -36,14 +30,9 @@
 
   const HOME_PATH = "C:\\Users\\Guest";
 
-  /** Background track — put bgm.mp3 next to index.html or change this URL. */
   const BGM_SRC = "https://file.garden/aTTWdSzGbgwzK_RD/Ariana%20Grande%20-%20Bye%20%5BAltare%20Remix%5D%20%23trendingsong%20%23bye%20%23arianagrande%20%23lyrics%20%23englishsongs%20%23song%20%5BPISfHwgA_eg%5D.mp3";
 
-  /**
-   * `members` command: edit the strings in ROSTER_NAMES only (max 35 rows).
-   * Need account/detail text? Change `members` below to your own array of
-   * `{ name: "…", detail: "…" }` objects instead of the map.
-   */
+ 
   const ROSTER_NAMES = [
     "YVES ",
     "YSA ",
@@ -90,10 +79,7 @@
 
   const MEMBERS_MAX = 35;
 
-  /**
-   * `links` command: edit LINK_ENTRIES (label + url per row).
-   * { label: "Display name", url: "https://…" }
-   */
+
   const LINK_ENTRIES = [
     { label: "founder", url: "https://www.facebook.com/yv9sk/" },
     { label: "discord", url: "https://discord.gg/sanzio" },
@@ -105,9 +91,7 @@
     links: LINK_ENTRIES,
   };
 
-  // ---------------------------------------------------------------------------
-  // State
-  // ---------------------------------------------------------------------------
+
 
   let cwd = HOME_PATH;
   /** @type {ReturnType<typeof setInterval> | null} */
@@ -118,9 +102,7 @@
   const TYPEWRITER_BASE_MS = 18;
   const TYPEWRITER_ASCII_MS = 3;
 
-  // ---------------------------------------------------------------------------
-  // DOM
-  // ---------------------------------------------------------------------------
+
 
   const out = document.getElementById("out");
   const cmd = document.getElementById("cmd");
@@ -156,9 +138,7 @@
     document.addEventListener("keydown", unlockBgm);
   }
 
-  // ---------------------------------------------------------------------------
-  // Utils
-  // ---------------------------------------------------------------------------
+
 
   function escapeHtml(s) {
     return s
@@ -376,9 +356,7 @@
     promptText.textContent = cwd + ">";
   }
 
-  // ---------------------------------------------------------------------------
-  // Commands
-  // ---------------------------------------------------------------------------
+
 
   function cmdCls() {
     stopMatrix();
@@ -573,9 +551,6 @@
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Init
-  // ---------------------------------------------------------------------------
 
   cmd.addEventListener("keydown", function (e) {
     if (e.key === "Enter") {
