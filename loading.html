@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Loading...</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <style>
+    /* -------------------------------------------------------------------------- */
+    /* Theme tokens                                                               */
+    /* -------------------------------------------------------------------------- */
+    :root {
+      --bg: #000000;
+      --fg: #f87171;
+      --dim: #8f3a3a;
+      --accent: #ff3b3b;
+      --ok: #ff5252;
+      --warn: #ff9f6e;
+      --err: #ffc9c9;
+      --border: #4a2525;
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* Base                                                                        */
+    /* -------------------------------------------------------------------------- */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "Cascadia Code", Consolas, "Lucida Console", monospace;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* Loading Screen                                                              */
+    /* -------------------------------------------------------------------------- */
+    .loading-container {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      z-index: 9999;
+      background: var(--bg);
+      backdrop-filter: blur(2px);
+    }
+
+    .loading-image {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      opacity: 0.9;
+      filter: drop-shadow(0 0 8px rgba(255, 59, 59, 0.3)) drop-shadow(0 0 16px rgba(255, 59, 59, 0.15));
+      animation: loading-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes loading-pulse {
+      0%, 100% {
+        opacity: 0.9;
+        filter: drop-shadow(0 0 8px rgba(255, 59, 59, 0.3)) drop-shadow(0 0 16px rgba(255, 59, 59, 0.15));
+      }
+      50% {
+        opacity: 1;
+        filter: drop-shadow(0 0 12px rgba(255, 59, 59, 0.5)) drop-shadow(0 0 24px rgba(255, 59, 59, 0.25));
+      }
+    }
+
+    .loading-text {
+      color: var(--fg);
+      font-size: 16px;
+      font-weight: 400;
+      text-shadow:
+        0 0 4px #000,
+        0 0 8px currentColor,
+        0 0 14px var(--accent),
+        0 0 22px rgba(255, 59, 59, 0.4);
+      letter-spacing: 2px;
+    }
+
+    /* Animated dots */
+    .loading-dots::after {
+      content: '';
+      animation: loading-dots 1.4s steps(4, end) infinite;
+    }
+
+    @keyframes loading-dots {
+      0%, 20% {
+        content: '';
+      }
+      40% {
+        content: '.';
+      }
+      60% {
+        content: '..';
+      }
+      80%, 100% {
+        content: '...';
+      }
+    }
+
+    /* Command prompt loading */
+    .loading-prompt {
+      font-size: 14px;
+      text-align: left;
+      min-width: 300px;
+      line-height: 1.5;
+    }
+
+    .prompt-line {
+      color: var(--ok);
+      text-shadow:
+        0 0 4px var(--ok),
+        0 0 12px color-mix(in srgb, var(--ok) 60%, transparent);
+    }
+
+    .prompt-text {
+      color: var(--fg);
+      text-shadow:
+        0 0 4px #000,
+        0 0 8px currentColor,
+        0 0 14px var(--accent);
+      min-height: 1.5em;
+    }
+
+    .prompt-cursor {
+      display: inline-block;
+      color: var(--accent);
+      text-shadow:
+        0 0 6px var(--accent),
+        0 0 14px color-mix(in srgb, var(--accent) 70%, transparent);
+      animation: cursor-blink 0.65s step-end infinite;
+      margin-left: 2px;
+    }
+
+    @keyframes cursor-blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    .loading-output {
+      color: var(--dim);
+      font-size: 12px;
+      text-shadow:
+        0 0 4px #000,
+        0 0 6px color-mix(in srgb, var(--dim) 50%, transparent);
+      min-height: 1.2em;
+      margin: 2px 0;
+    }
+
+    /* Disable scrolling while loading */
+    body.loading-active {
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-container" id="loadingScreen">
+    <!-- Replace 'your-image.png' with your image path -->
+    <img src="your-image.png" alt="Loading" class="loading-image" />
+    <div class="loading-text">ALL HAIL TRIAD<span class="loading-dots"></span></div>
+    <div class="loading-prompt">
+      <div class="prompt-line">C:\Users\Guest&gt; <span class="prompt-text" id="loadingCmd">initializing<span class="prompt-cursor">▌</span></span></div>
+      <div class="loading-output" id="loadingOutput"></div>
+    </div>
+  </div>
+
+  <script>
+    document.body.classList.add('loading-active');
+
+    const commands = [
+      'initializing kernel...',
+      'loading modules...',
+      'connecting to database...',
+      'parsing files...',
+      'initializing display...',
+      'ready'
+    ];
+
+    let currentCmd = 0;
+    const cmdElement = document.getElementById('loadingCmd');
+    const outputElement = document.getElementById('loadingOutput');
+
+    const updateCommand = () => {
+      if (currentCmd < commands.length) {
+        const text = commands[currentCmd];
+        cmdElement.textContent = text;
+        
+        // Add cursor back
+        const cursor = document.createElement('span');
+        cursor.className = 'prompt-cursor';
+        cursor.textContent = '▌';
+        cmdElement.appendChild(cursor);
+
+        // Show previous commands in output
+        if (currentCmd > 0) {
+          const prevOutput = document.createElement('div');
+          prevOutput.className = 'loading-output';
+          prevOutput.textContent = '$ ' + commands[currentCmd - 1];
+          outputElement.insertBefore(prevOutput, outputElement.firstChild);
+        }
+
+        currentCmd++;
+        setTimeout(updateCommand, 500);
+      }
+    };
+
+    updateCommand();
+
+    // Hide loading screen after 3 seconds
+    setTimeout(() => {
+      const loadingScreen = document.getElementById('loadingScreen');
+      loadingScreen.style.opacity = '0';
+      loadingScreen.style.transition = 'opacity 0.6s ease-out';
+      setTimeout(() => {
+        loadingScreen.style.display = 'none';
+        document.body.classList.remove('loading-active');
+      }, 600);
+    }, 3000);
+  </script>
+</body>
+</html>
