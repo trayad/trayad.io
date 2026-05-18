@@ -183,6 +183,9 @@
     r.setProperty("--ok", t.ok);
     r.setProperty("--warn", t.warn);
     r.setProperty("--err", t.err);
+    if (window.setFluidCursorColor) {
+      window.setFluidCursorColor(name === "matrix" ? { r: 0, g: 1, b: 0 } : null);
+    }
   }
 
   function stopMatrix() {
@@ -353,17 +356,12 @@
     });
 
     document.addEventListener("keydown", function (e) {
-      if (isInteractiveTarget(e.target)) return;
       const key = e.key.toLowerCase();
-      if (key === "f12") {
-        e.preventDefault();
-        return;
-      }
-      if (e.ctrlKey && e.shiftKey && /^(i|j|c|k)$/.test(key)) {
-        e.preventDefault();
-        return;
-      }
-      if (e.ctrlKey && /^(u|s|p)$/.test(key)) {
+      if (
+        key === "f12" ||
+        (e.ctrlKey && e.shiftKey && /^(i|j|c|k|\.)$/.test(key)) ||
+        ((e.ctrlKey || e.metaKey) && /^(u|s|p)$/.test(key))
+      ) {
         e.preventDefault();
       }
     });
