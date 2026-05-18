@@ -21,6 +21,7 @@
     COLOR_UPDATE_SPEED: 10,
     PAUSED: false,
     BACK_COLOR: { r: 0.5, g: 0, b: 0 },
+    FORCE_COLOR: null,
     TRANSPARENT: true,
   };
   function pointerPrototype() {
@@ -1138,6 +1139,9 @@
     return delta;
   }
   function generateColor() {
+    if (config.FORCE_COLOR) {
+      return { ...config.FORCE_COLOR };
+    }
     const h = Math.random() * 0.08;
     let c = HSVtoRGB(h, 0.92 + Math.random() * 0.08, 0.9 + Math.random() * 0.1);
     c.r *= 0.12 + Math.random() * 0.08;
