@@ -30,7 +30,7 @@
 
   const HOME_PATH = "C:\\Users\\Guest";
 
-  const BGM_SRC = "https://file.garden/aTTWdSzGbgwzK_RD/Ariana%20Grande%20-%20Bye%20%5BAltare%20Remix%5D%20%23trendingsong%20%23bye%20%23arianagrande%20%23lyrics%20%23englishsongs%20%23song%20%5BPISfHwgA_eg%5D.mp3";
+  const BGM_SRC = "https://file.garden/aTTWdSzGbgwzK_RD/Chase%20Atlantic%20-%20DIE%20FOR%20ME%20(Official%20Lyric%20Video).mp3";
 
  
   const ROSTER_NAMES = [
