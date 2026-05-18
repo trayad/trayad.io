@@ -1,6 +1,4 @@
-/* -------------------------------------------------------------------------- */
-/* Theme tokens (overridden by JS when using color / matrix themes)          */
-/* -------------------------------------------------------------------------- */
+
 :root {
   --bg: #000000;
   --fg: #f87171;
@@ -12,9 +10,7 @@
   --border: #4a2525;
 }
 
-/* -------------------------------------------------------------------------- */
-/* Base                                                                        */
-/* -------------------------------------------------------------------------- */
+
 *,
 *::before,
 *::after {
@@ -42,7 +38,7 @@ body {
   display: block;
 }
 
-/* Scrollbars: hidden; gutter matches black page (no bright track flash). */
+
 html,
 body,
 .output,
@@ -74,9 +70,7 @@ body::-webkit-scrollbar-thumb,
   background: #000000;
 }
 
-/* -------------------------------------------------------------------------- */
-/* Layout: faux window                                                         */
-/* -------------------------------------------------------------------------- */
+
 .shell {
   position: relative;
   z-index: 1;
@@ -99,9 +93,7 @@ body::-webkit-scrollbar-thumb,
   overflow: hidden;
 }
 
-/* -------------------------------------------------------------------------- */
-/* ASCII banner                                                                */
-/* -------------------------------------------------------------------------- */
+
 .ascii-wrap {
   padding: 12px 14px 8px;
   overflow-x: auto;
@@ -128,9 +120,7 @@ body::-webkit-scrollbar-thumb,
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/* Scroll output + fixed prompt row                                            */
-/* -------------------------------------------------------------------------- */
+
 .output {
   flex: 1;
   min-height: 0;
@@ -238,9 +228,7 @@ body::-webkit-scrollbar-thumb,
   color: inherit;
 }
 
-/* -------------------------------------------------------------------------- */
-/* Terminal output helpers (used in innerHTML from JS)                         */
-/* -------------------------------------------------------------------------- */
+
 .accent {
   color: var(--accent);
 }
@@ -261,9 +249,7 @@ body::-webkit-scrollbar-thumb,
   color: var(--dim);
 }
 
-/* -------------------------------------------------------------------------- */
-/* members command: file-style roster (inner markup from JS)                 */
-/* -------------------------------------------------------------------------- */
+
 .members-file {
   margin: 0 0 8px;
   padding: 10px 12px;
@@ -278,9 +264,7 @@ body::-webkit-scrollbar-thumb,
   font-weight: 600;
 }
 
-/* -------------------------------------------------------------------------- */
-/* links command: bookmark list (inner markup from JS)                        */
-/* -------------------------------------------------------------------------- */
+
 .links-file {
   margin: 0 0 8px;
   padding: 10px 12px;
@@ -309,9 +293,7 @@ body::-webkit-scrollbar-thumb,
   text-decoration: underline;
 }
 
-/* -------------------------------------------------------------------------- */
-/* Matrix rain strip (class added by JS)                                       */
-/* -------------------------------------------------------------------------- */
+
 .matrix-rain {
   font-size: 11px;
   line-height: 1.1;
