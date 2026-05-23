@@ -21,7 +21,7 @@ html,
 body {
   height: 100%;
   margin: 0;
-  background: var(--bg);
+  background: var(--bg) url('https://file.garden/aTTWdSzGbgwzK_RD/ffbe137571e3c65cbac8cfb485938f7c.gif') center center / cover no-repeat fixed;
   color: var(--fg);
   font-family: "Cascadia Code", Consolas, "Lucida Console", monospace;
   font-size: 14px;
@@ -473,6 +473,8 @@ body::-webkit-scrollbar-thumb,
   flex-direction: column;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.8);
   user-select: none;
+  opacity: 1;
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .center-terminal.is-dragging {
@@ -482,6 +484,32 @@ body::-webkit-scrollbar-thumb,
 
 .center-terminal.hidden {
   display: none;
+}
+
+.center-terminal.entering {
+  animation: terminal-in 0.25s ease forwards;
+}
+
+@keyframes terminal-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 12px));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes terminal-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 8px));
+  }
 }
 
 .center-header {
@@ -551,5 +579,37 @@ body::-webkit-scrollbar-thumb,
   align-items: center;
   padding: 40px 48px 24px;
   overflow: visible;
+}
+
+/* Right side ASCII art panel */
+.ascii-sidebar-right {
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ascii-sidebar-art {
+  margin: 0;
+  padding: 0 20px;
+  color: var(--accent);
+  font-family: "Cascadia Code", Consolas, "Lucida Console", monospace;
+  font-size: 15px;
+  line-height: 1.2;
+  white-space: pre;
+  text-shadow:
+    0 0 2px #000,
+    0 0 6px var(--accent),
+    0 0 12px var(--accent),
+    0 0 22px rgba(255, 59, 59, 0.7),
+    0 0 36px rgba(255, 59, 59, 0.4);
+  filter: drop-shadow(0 0 8px rgba(255, 59, 59, 0.5));
 }
 
