@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>triad #snz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="fluid" aria-hidden="true"></canvas>
+  <audio id="bgm" crossorigin="anonymous"></audio>
+  <div class="shell">
+    <div class="viewport">
+      <div class="output" id="out" aria-live="polite"></div>
+      <div class="output output--prompt-area">
+        <p class="line prompt-line">
+          <span class="prompt" id="promptText">C:\Users\Guest&gt;</span>
+          <span class="input-wrap">
+            <input id="cmd" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Command line" />
+          </span>
+        </p>
+        <p class="hint dim">Tip: try <kbd>help</kbd>, <kbd>color</kbd>, <kbd>matrix</kbd>, or <kbd>cls</kbd></p>
+      </div>
+    </div>
+    <div class="ascii-wrap">
+      <pre class="ascii-art" id="banner">sdSS_SSSSSSbs   .S_sSSs     .S   .S_SSSs     .S_sSSs
+YSSS~S%SSSSSP  .SS~YS%%b   .SS  .SS~SSSSS   .SS~YS%%b
+     S%S       S%S   `S%b  S%S  S%S   SSSS  S%S   `S%b
+     S%S       S%S    S%S  S%S  S%S    S%S  S%S    S%S
+     S&S       S%S    d*S  S&S  S%S SSSS%S  S%S    S&S
+     S&S       S&S   .S*S  S&S  S&S  SSS%S  S&S    S&S
+     S&S       S&S_sdSSS   S&S  S&S    S&S  S&S    S&S
+     S&S       S&S~YSY%b   S&S  S&S    S&S  S&S    S&S
+     S*S       S*S   `S%b  S*S  S*S    S&S  S*S    d*S
+     S*S       S*S    S%S  S*S  S*S    S*S  S*S   .S*S
+     S*S       S*S    S&S  S*S  S*S    S*S  S*S_sdSSS
+     S*S       S*S    SSS  S*S  SSS    S*S  SSS~YSSY
+     SP        SP          SP          SP
+     Y         Y           Y           Y</pre>
+    </div>
+  </div>
+  <script src="fluid-cursor.js" defer></script>
+  <script src="script.js" defer></script>
+</body>
+</html>
