@@ -11,11 +11,36 @@
 }
 
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+/* Click-to-enter overlay */
+#enter-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
+
+#enter-btn {
+  color: var(--accent);
+  font-family: "Cascadia Code", Consolas, "Lucida Console", monospace;
+  font-size: 18px;
+  letter-spacing: 0.1em;
+  text-shadow:
+    0 0 6px var(--accent),
+    0 0 14px var(--accent),
+    0 0 28px rgba(255, 59, 59, 0.6);
+  animation: enter-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes enter-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+
 
 html,
 body {
@@ -26,6 +51,47 @@ body {
   font-family: "Cascadia Code", Consolas, "Lucida Console", monospace;
   font-size: 14px;
   line-height: 1.35;
+}
+
+/* CRT / old TV effect layered over the background */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* scanlines */
+body::before {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.18) 2px,
+    rgba(0, 0, 0, 0.18) 4px
+  );
+  z-index: 2;
+}
+
+/* vignette + flicker */
+body::after {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    rgba(0, 0, 0, 0.75) 100%
+  );
+  animation: crt-flicker 0.12s infinite;
+  z-index: 2;
+}
+
+@keyframes crt-flicker {
+  0%   { opacity: 1; }
+  25%  { opacity: 0.97; }
+  50%  { opacity: 1; }
+  75%  { opacity: 0.95; }
+  100% { opacity: 1; }
 }
 
 #fluid {
@@ -73,7 +139,7 @@ body::-webkit-scrollbar-thumb,
 
 .shell {
   position: relative;
-  z-index: 1;
+  z-index: 3;
   min-height: 100%;
   display: flex;
   flex-direction: row;
