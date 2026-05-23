@@ -108,11 +108,56 @@
   const cmd = document.getElementById("cmd");
   const promptText = document.getElementById("promptText");
   const bgm = document.getElementById("bgm");
+  const centerTerminal = document.getElementById("centerTerminal");
+  const centerOut = document.getElementById("centerOut");
+  const tabCloseCenter = document.querySelector(".tab-close-center");
 
   if (!out || !cmd || !promptText) {
     console.error("Terminal shell: missing required elements.");
     return;
   }
+
+  tabCloseCenter.addEventListener("click", function () {
+    centerTerminal.classList.add("hidden");
+  });
+
+  // — Draggable output tab —
+  (function initDrag() {
+    const header = centerTerminal.querySelector(".center-header");
+    let dragging = false;
+    let startX = 0, startY = 0, origLeft = 0, origTop = 0;
+
+    function snapToCenter() {
+      const rect = centerTerminal.getBoundingClientRect();
+      centerTerminal.style.left = rect.left + "px";
+      centerTerminal.style.top = rect.top + "px";
+      centerTerminal.style.transform = "none";
+    }
+
+    header.addEventListener("mousedown", function (e) {
+      if (e.target.closest("button")) return;
+      if (centerTerminal.style.transform !== "none") snapToCenter();
+      dragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      origLeft = parseFloat(centerTerminal.style.left);
+      origTop = parseFloat(centerTerminal.style.top);
+      centerTerminal.classList.add("is-dragging");
+      e.preventDefault();
+    });
+
+    document.addEventListener("mousemove", function (e) {
+      if (!dragging) return;
+      centerTerminal.style.left = (origLeft + e.clientX - startX) + "px";
+      centerTerminal.style.top = (origTop + e.clientY - startY) + "px";
+    });
+
+    document.addEventListener("mouseup", function () {
+      if (!dragging) return;
+      dragging = false;
+      centerTerminal.classList.remove("is-dragging");
+    });
+  })();
 
   if (bgm && BGM_SRC) {
     bgm.src = BGM_SRC;
@@ -311,19 +356,6 @@
     });
   }
 
-  async function typeAsciiBanner() {
-    const banner = document.getElementById("banner");
-    if (!banner) return;
-    const raw = banner.textContent.replace(/^\n+|\n+$/g, "");
-    banner.textContent = "";
-
-    const step = asciiCharDelay(raw.length);
-    for (let i = 0; i < raw.length; i++) {
-      banner.textContent += raw[i];
-      await delay(step);
-    }
-  }
-
   function isInteractiveTarget(el) {
     if (!el || !el.closest) return false;
     return !!el.closest("#cmd, .input-wrap, .output--prompt-area, a, button, input, textarea");
@@ -502,6 +534,9 @@
     const line = raw.trim();
     if (!line) return;
 
+    centerTerminal.classList.remove("hidden");
+    centerOut.innerHTML = "";
+
     enqueuePrint(async function () {
       await printTyped(
         `<span class="prompt">${escapeHtml(cwd)}&gt;</span> ${escapeHtml(line)}`
@@ -511,6 +546,52 @@
       const head = parts[0].toLowerCase();
       const rest = parts.slice(1).join(" ");
 
+      const printCenter = async function (html, className) {
+        const isBlock = className === "members-file" || className === "links-file";
+        const el = document.createElement(isBlock ? "pre" : "p");
+        el.className = "line" + (className ? " " + className : "");
+        centerOut.appendChild(el);
+        const src = document.createElement("div");
+        src.innerHTML = html;
+
+        // typewriter into centerOut element
+        const total = countTextNodes(src);
+        const step = charDelay(total, TYPEWRITER_BASE_MS);
+        const cursor = document.createElement("span");
+        cursor.className = "tw-cursor";
+        cursor.textContent = "▌";
+        el.appendChild(cursor);
+
+        async function walkCenter(source, dest) {
+          for (let i = 0; i < source.childNodes.length; i++) {
+            const child = source.childNodes[i];
+            if (child.nodeType === Node.TEXT_NODE) {
+              const text = child.textContent;
+              if (!text) continue;
+              const live = document.createTextNode("");
+              dest.insertBefore(live, dest === el ? cursor : null);
+              for (let c = 0; c < text.length; c++) {
+                live.textContent += text[c];
+                centerOut.scrollTop = centerOut.scrollHeight;
+                await delay(step);
+              }
+            } else if (child.nodeType === Node.ELEMENT_NODE) {
+              const clone = child.cloneNode(false);
+              if (dest === el) {
+                dest.insertBefore(clone, cursor);
+              } else {
+                dest.appendChild(clone);
+              }
+              await walkCenter(child, clone);
+            }
+          }
+        }
+
+        await walkCenter(src, el);
+        cursor.remove();
+        centerOut.scrollTop = centerOut.scrollHeight;
+      };
+
       switch (head) {
         case "cls":
         case "clear":
@@ -518,35 +599,91 @@
           break;
         case "help":
         case "?":
-          cmdHelp();
+          await printCenter(
+            [
+              "<span class='ok'>Available commands:</span>",
+              "  <span class='accent'>help</span>     show cmd",
+              "  <span class='accent'>cls</span>      clear screen",
+              "  <span class='accent'>echo</span>     print text (echo hello)",
+              "  <span class='accent'>date</span>     current date/time",
+              "  <span class='accent'>color</span>    default (red/black) or matrix",
+              "  <span class='accent'>matrix</span>   toggle matrix",
+              "  <span class='accent'>members</span>  list of verified members",
+              "  <span class='accent'>links</span>    list of links",
+              "",
+            ].join("\n")
+          );
           break;
         case "echo":
-          cmdEcho(rest);
+          await printCenter(escapeHtml(rest) || ".");
           break;
         case "date":
         case "time":
-          await printTyped(escapeHtml(new Date().toString()));
+          await printCenter(escapeHtml(new Date().toString()));
           break;
         case "color":
           cmdColor(parts);
+          await printCenter(`<span class='ok'>Color scheme:</span> ${escapeHtml((parts[1] || "default").toLowerCase())}`);
           break;
         case "matrix":
           cmdMatrix();
           break;
         case "members":
-          cmdMembers();
+          const raw_members = MEMBERS_FILE.members || [];
+          const rows_members = raw_members.slice(0, MEMBERS_MAX);
+          let html_members = "";
+          html_members += `<span class="members-file__path">${escapeHtml(MEMBERS_FILE.path || "MEMBERS.LST")}</span>\n`;
+          if (MEMBERS_FILE.subtitle) {
+            html_members += `<span class="dim">${escapeHtml(MEMBERS_FILE.subtitle)}</span>\n`;
+          }
+          if (rows_members.length === 0) {
+            html_members += `<span class="dim">  (empty file — add objects to MEMBERS_FILE.members)</span>\n`;
+          } else {
+            for (let i = 0; i < rows_members.length; i++) {
+              const r = rows_members[i] || {};
+              const name = String(r.name != null ? r.name : "");
+              const branch = i === rows_members.length - 1 ? "└── " : "├── ";
+              html_members += `<span class="dim">${escapeHtml(branch)}</span><span class="ok">${escapeHtml(name)}</span>\n`;
+            }
+          }
+          await printCenter(html_members, "members-file");
           break;
         case "links":
         case "link":
-          cmdLinks();
+          const rows_links = LINKS_FILE.links || [];
+          let html_links = "";
+          html_links += `<span class="links-file__path">${escapeHtml(LINKS_FILE.path || "LINKS.URL")}</span>\n`;
+          if (LINKS_FILE.subtitle) {
+            html_links += `<span class="dim">${escapeHtml(LINKS_FILE.subtitle)}</span>\n`;
+          }
+          if (rows_links.length === 0) {
+            html_links += `<span class="dim">  (empty — add rows to LINK_ENTRIES in script.js)</span>\n`;
+          } else {
+            for (let i = 0; i < rows_links.length; i++) {
+              const r = rows_links[i] || {};
+              const label = String(
+                r.label != null ? r.label : r.name != null ? r.name : ""
+              );
+              const href = safeHref(r.url);
+              const urlText = String(r.url != null ? r.url : "");
+              const branch = i === rows_links.length - 1 ? "└── " : "├── ";
+              const labelHtml = href
+                ? `<a class="links-file__link" href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label || urlText)}</a>`
+                : `<span class="warn">${escapeHtml(label || "(no label)")}</span>`;
+              html_links += `<span class="dim">${escapeHtml(branch)}</span>${labelHtml} <span class="dim">${escapeHtml(urlText)}</span>\n`;
+            }
+          }
+          await printCenter(html_links, "links-file");
           break;
         case "exit":
-          await printTyped(
+          await printCenter(
             "<span class='warn'>You cannot exit the browser from here. Close the tab instead.</span>"
           );
           break;
         default:
-          cmdUnknown(parts[0]);
+          await printCenter(
+            `<span class='err'>'${escapeHtml(parts[0])}' is not recognized as an internal or external command,</span>\n<span class='err'>operable program or batch file.</span>`
+          );
       }
     });
   }
@@ -576,8 +713,13 @@
   initSourceProtection();
   cmd.focus();
   applyTheme("default");
-  typeAsciiBanner();
   print(
-    "<span class='dim'>@snz\nType </span><span class='accent'>help</span><span class='dim'> for commands.</span>"
+    "<span style='display:flex;flex-direction:row;align-items:flex-start;gap:12px;'>" +
+      "<img src='https://file.garden/aTTWdSzGbgwzK_RD/538d88d2332c4b18566808d5e3224cdc.gif' style='width:60px;height:auto;flex-shrink:0;' aria-hidden='true' />" +
+      "<span style='display:flex;flex-direction:column;gap:4px;'>" +
+        "<span class='dim'>@snz</span>" +
+        "<span><span class='dim'>Type </span><span class='accent'>help</span><span class='dim'> for commands.</span></span>" +
+      "</span>" +
+    "</span>"
   );
 })();
