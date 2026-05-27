@@ -46,7 +46,7 @@ html,
 body {
   height: 100%;
   margin: 0;
-  background: var(--bg) url('https://file.garden/aTTWdSzGbgwzK_RD/ffbe137571e3c65cbac8cfb485938f7c.gif') center center / cover no-repeat fixed;
+  background: var(--bg) url('') center center / cover no-repeat fixed;
   color: var(--fg);
   font-family: "Cascadia Code", Consolas, "Lucida Console", monospace;
   font-size: 14px;
